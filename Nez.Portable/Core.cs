@@ -145,15 +145,20 @@ namespace Nez
 		void onOrientationChanged( object sender, EventArgs e )
 		{
 			emitter.emit( CoreEvents.OrientationChanged );
-		}
+	    }
+
+	    public static bool isOnTransition()
+	    {
+	        return _instance._sceneTransition != null;
+	    }
 
 
-		/// <summary>
-		/// this gets called whenever the screen size changes
-		/// </summary>
-		/// <param name="sender">Sender.</param>
-		/// <param name="e">E.</param>
-		protected void onGraphicsDeviceReset( object sender, EventArgs e )
+        /// <summary>
+        /// this gets called whenever the screen size changes
+        /// </summary>
+        /// <param name="sender">Sender.</param>
+        /// <param name="e">E.</param>
+        protected void onGraphicsDeviceReset( object sender, EventArgs e )
 		{
 			// we coalese these to avoid spamming events
 			if( _graphicsDeviceChangeTimer != null )

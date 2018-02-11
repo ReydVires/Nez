@@ -199,10 +199,11 @@ namespace Nez
 		/// </summary>
 		Rectangle _finalRenderDestinationRect;
 
-		#endregion
+        #endregion
 
+	    public static Point virtualSize;
 
-		RenderTarget2D _sceneRenderTarget;
+        RenderTarget2D _sceneRenderTarget;
 		RenderTarget2D _destinationRenderTarget;
 		Action<Texture2D> _screenshotRequestCallback;
 
@@ -223,7 +224,8 @@ namespace Nez
 		/// <param name="verticalBleed">Vertical bleed size. Used only if resolution policy is set to <see cref="SceneResolutionPolicy.BestFit"/>.</param>
 		public static void setDefaultDesignResolution( int width, int height, SceneResolutionPolicy sceneResolutionPolicy, int horizontalBleed = 0, int verticalBleed = 0 )
 		{
-			_defaultDesignResolutionSize = new Point( width, height );
+		    virtualSize = new Point(width, height);
+            _defaultDesignResolutionSize = new Point( width, height );
 			_defaultSceneResolutionPolicy = sceneResolutionPolicy;
 			if( _defaultSceneResolutionPolicy == SceneResolutionPolicy.BestFit )
 				_defaultDesignBleedSize = new Point( horizontalBleed, verticalBleed );
@@ -962,17 +964,28 @@ namespace Nez
 			_postProcessors.remove( step );
 		}
 
-		#endregion
+        #endregion
 
 
-		#region Entity Management
+        #region Entity Management
 
-		/// <summary>
-		/// add the Entity to this Scene, and return it
-		/// </summary>
-		/// <typeparam name="T">entity type</typeparam>
-		/// <returns></returns>
-		public Entity createEntity( string name )
+	    /// <summary>
+	    /// add the Entity without a name to this Scene, and return it
+	    /// </summary>
+	    /// <typeparam name="T">entity type</typeparam>
+	    /// <returns></returns>
+	    public Entity createEntity()
+	    {
+	        var entity = new Entity();
+	        return addEntity(entity);
+	    }
+
+        /// <summary>
+        /// add the Entity to this Scene, and return it
+        /// </summary>
+        /// <typeparam name="T">entity type</typeparam>
+        /// <returns></returns>
+        public Entity createEntity( string name )
 		{
 			var entity = new Entity( name );
 			return addEntity( entity );

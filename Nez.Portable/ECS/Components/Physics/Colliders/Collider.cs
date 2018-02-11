@@ -375,12 +375,32 @@ namespace Nez
 			shape.position = oldPosition;
 
 			return didCollide;
-		}
+	    }
 
-		#endregion
+	    public bool collidesWithAnyOfType<T>(out CollisionResult result)
+	    {
+	        result = new CollisionResult();
+
+	        // fetch anything that we might collide with at our new position
+	        var neighbors = Physics.boxcastBroadphaseByType<T>(this, collidesWithLayers);
+
+	        foreach (var neighbor in neighbors)
+	        {
+	            // skip triggers
+	            if (neighbor.isTrigger)
+	                continue;
+
+	            if (collidesWith(neighbor, out result))
+	                return true;
+	        }
+
+	        return false;
+	    }
+
+        #endregion
 
 
-		public override Component clone()
+        public override Component clone()
 		{
 			var collider = MemberwiseClone() as Collider;
 			collider.entity = null;

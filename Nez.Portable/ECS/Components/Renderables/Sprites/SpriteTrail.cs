@@ -14,10 +14,10 @@ namespace Nez.Sprites
 	/// </summary>
 	public class SpriteTrail : RenderableComponent, IUpdatable
 	{
-		/// <summary>
-		/// helper class that houses the data required for the individual trail instances
-		/// </summary>
-		class SpriteTrailInstance
+        /// <summary>
+        /// helper class that houses the data required for the individual trail instances
+        /// </summary>
+        protected class SpriteTrailInstance
 		{
 			public Vector2 position;
 			Subtexture _subtexture;
@@ -27,8 +27,9 @@ namespace Nez.Sprites
 			Color _initialColor;
 			Color _targetColor;
 			Color _renderColor;
+		    bool _forceFade;
 
-			float _rotation;
+            float _rotation;
 			Vector2 _origin;
 			Vector2 _scale;
 			SpriteEffects _spriteEffects;
@@ -47,7 +48,8 @@ namespace Nez.Sprites
 				_fadeDelay = fadeDelay;
 				_initialColor = initialColor;
 				_targetColor = targetColor;
-			}
+			    _forceFade = false;
+            }
 
 
 			public void setSpriteRenderOptions( float rotation, Vector2 origin, Vector2 scale, SpriteEffects spriteEffects, float layerDepth )
@@ -57,18 +59,22 @@ namespace Nez.Sprites
 				_scale = scale;
 				_spriteEffects = spriteEffects;
 				_layerDepth = layerDepth;
-			}
+		    }
 
+		    public void forceFade()
+		    {
+		        _forceFade = true;
+		    }
 
-			/// <summary>
-			/// returns true when the fade out is complete
-			/// </summary>
-			[MethodImpl( MethodImplOptions.AggressiveInlining )]
+            /// <summary>
+            /// returns true when the fade out is complete
+            /// </summary>
+            [MethodImpl( MethodImplOptions.AggressiveInlining )]
 			public bool update()
-			{
-				_elapsedTime += Time.deltaTime;
-				// fading block
-				if( _elapsedTime > _fadeDelay && _elapsedTime < _fadeDuration + _fadeDelay )
+            {
+                _elapsedTime += Time.deltaTime * (_forceFade ? 3 : 1);
+                // fading block
+                if ( _elapsedTime > _fadeDelay && _elapsedTime < _fadeDuration + _fadeDelay )
 				{
 					var t = Mathf.map01( _elapsedTime, 0f, _fadeDelay + _fadeDuration );
 					ColorExt.lerp( ref _initialColor, ref _targetColor, out _renderColor, t );
@@ -123,21 +129,21 @@ namespace Nez.Sprites
 		/// </summary>
 		public Color fadeToColor = Color.Transparent;
 
-		int _maxSpriteInstances = 15;
-		Stack<SpriteTrailInstance> _availableSpriteTrailInstances = new Stack<SpriteTrailInstance>();
-		List<SpriteTrailInstance> _liveSpriteTrailInstances = new List<SpriteTrailInstance>( 5 );
-		Vector2 _lastPosition;
-		Sprite _sprite;
+		protected int _maxSpriteInstances = 15;
+	    protected Stack<SpriteTrailInstance> _availableSpriteTrailInstances = new Stack<SpriteTrailInstance>();
+	    protected List<SpriteTrailInstance> _liveSpriteTrailInstances = new List<SpriteTrailInstance>( 5 );
+	    protected Vector2 _lastPosition;
+	    protected Sprite _sprite;
 
-		/// <summary>
-		/// flag when true it will always add a new instance regardless of the distance check
-		/// </summary>
-		bool _isFirstInstance;
+        /// <summary>
+        /// flag when true it will always add a new instance regardless of the distance check
+        /// </summary>
+        protected bool _isFirstInstance;
 
-		/// <summary>
-		/// if awaitingDisable all instances are allowed to fade out before the component is disabled
-		/// </summary>
-		bool _awaitingDisable;
+        /// <summary>
+        /// if awaitingDisable all instances are allowed to fade out before the component is disabled
+        /// </summary>
+        protected bool _awaitingDisable;
 
 
 		public SpriteTrail()
@@ -267,7 +273,7 @@ namespace Nez.Sprites
 		}
 
 
-		void IUpdatable.update()
+	    public virtual void update()
 		{
 			if( _isFirstInstance )
 			{
@@ -311,10 +317,10 @@ namespace Nez.Sprites
 		}
 
 
-		/// <summary>
-		/// stores the last position for distance calculations and spawns a new trail instance if there is one available in the stack
-		/// </summary>
-		void spawnInstance()
+        /// <summary>
+        /// stores the last position for distance calculations and spawns a new trail instance if there is one available in the stack
+        /// </summary>
+        protected void spawnInstance()
 		{
 			_lastPosition = _sprite.entity.transform.position + _sprite.localOffset;
 

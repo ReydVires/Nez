@@ -256,15 +256,20 @@ namespace Nez
 			return _spatialHash.aabbBroadphase( ref bounds, collider, layerMask );
 		}
 
+	    public static IEnumerable<Collider> boxcastBroadphaseByType<T>(Collider collider, int layerMask = allLayers)
+	    {
+	        var bounds = collider.bounds;
+	        return _spatialHash.aabbBroadphaseByType<T>(ref bounds, layerMask);
+	    }
 
-		/// <summary>
-		/// returns all colliders that are intersected by bounds excluding the passed-in collider (self).
-		/// this method is useful if you want to create the swept bounds on your own for other queries
-		/// </summary>
-		/// <returns>The excluding self.</returns>
-		/// <param name="collider">Collider.</param>
-		/// <param name="bounds">Bounds.</param>
-		public static IEnumerable<Collider> boxcastBroadphaseExcludingSelf( Collider collider, ref RectangleF rect, int layerMask = allLayers )
+        /// <summary>
+        /// returns all colliders that are intersected by bounds excluding the passed-in collider (self).
+        /// this method is useful if you want to create the swept bounds on your own for other queries
+        /// </summary>
+        /// <returns>The excluding self.</returns>
+        /// <param name="collider">Collider.</param>
+        /// <param name="bounds">Bounds.</param>
+        public static IEnumerable<Collider> boxcastBroadphaseExcludingSelf( Collider collider, ref RectangleF rect, int layerMask = allLayers )
 		{
 			return _spatialHash.aabbBroadphase( ref rect, collider, layerMask );
 		}

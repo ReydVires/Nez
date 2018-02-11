@@ -253,18 +253,51 @@ namespace Nez.Spatial
 			}
 
 			return _tempHashset;
-		}
+	    }
+
+	    public HashSet<Collider> aabbBroadphaseByType<T>(ref RectangleF bounds, int layerMask)
+	    {
+	        _tempHashset.Clear();
+
+	        var p1 = cellCoords(bounds.x, bounds.y);
+	        var p2 = cellCoords(bounds.right, bounds.bottom);
+
+	        for (var x = p1.X; x <= p2.X; x++)
+	        {
+	            for (var y = p1.Y; y <= p2.Y; y++)
+	            {
+	                var cell = cellAtPosition(x, y);
+	                if (cell == null)
+	                    continue;
+
+	                // we have a cell. loop through and fetch all the Colliders
+	                for (var i = 0; i < cell.Count; i++)
+	                {
+	                    var collider = cell[i];
+
+	                    // skip this collider if it is our excludeCollider or if it doesnt match our layerMask
+	                    if (!(collider is T) || !Flags.isFlagSet(layerMask, collider.physicsLayer))
+	                        continue;
+
+	                    if (bounds.intersects(collider.bounds))
+	                        _tempHashset.Add(collider);
+	                }
+	            }
+	        }
+
+	        return _tempHashset;
+	    }
 
 
-		/// <summary>
-		/// casts a line through the spatial hash and fills the hits array up with any colliders that the line hits
-		/// </summary>
-		/// <returns>the number of Colliders returned</returns>
-		/// <param name="start">Start.</param>
-		/// <param name="end">End.</param>
-		/// <param name="hits">Hits.</param>
-		/// <param name="layerMask">Layer mask.</param>
-		public int linecast( Vector2 start, Vector2 end, RaycastHit[] hits, int layerMask )
+        /// <summary>
+        /// casts a line through the spatial hash and fills the hits array up with any colliders that the line hits
+        /// </summary>
+        /// <returns>the number of Colliders returned</returns>
+        /// <param name="start">Start.</param>
+        /// <param name="end">End.</param>
+        /// <param name="hits">Hits.</param>
+        /// <param name="layerMask">Layer mask.</param>
+        public int linecast( Vector2 start, Vector2 end, RaycastHit[] hits, int layerMask )
 		{
 			var ray = new Ray2D( start, end );
 			_raycastParser.start( ref ray, hits, layerMask );
